@@ -1,20 +1,29 @@
 'use strict';
 
 angular.module('omtApp', [
-  'ngRoute',
+  'ngSanitize',
+  'ui.bootstrap',
+  'ui.select',
+  'ui.router',
+  'leaflet-directive',
   'omt.controllers'
 ])
-.config(['$routeProvider', config]);
+.config(['$stateProvider', '$urlRouterProvider', config]);
 
-function config($routeProvider) {
-  $routeProvider
+function config($stateProvider, $urlRouterProvider) {
+  $urlRouterProvider.otherwise('/');
 
-  .when('/', {
+  $stateProvider
+
+  .state('main', {
+    url: '/',
     templateUrl: 'partials/main.html',
     controller: 'MainCtrl'
   })
 
-  .otherwise({
-    redirectTo: '/'
+  .state('location', {
+    url: '/location',
+    templateUrl: 'partials/location.html',
+    controller: 'LocationCtrl'
   });
 }

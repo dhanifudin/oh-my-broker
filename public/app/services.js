@@ -3,14 +3,16 @@ angular.module('omt.services', [])
 
 /* mqttService {{{ */
 function mqttService($rootScope) {
+
   return {
     mqtt: function(username) {
       var options = {
-        clientId: username
+        clientId: 'webtrack_' + username
       };
       return mqtt.connect(options);
     }
   }
+
   /* var service = { */
   /*   connect: connect */
   /*   publish: publish, */

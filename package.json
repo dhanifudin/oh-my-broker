@@ -16,6 +16,7 @@
     "body-parser": "^1.11.0",
     "express": "^4.11.2",
     "express-myconnection": "^1.0.4",
+    "mongodb": "^1.4.30",
     "mosca": "git+https://github.com/dhanifudin/mosca",
     "mysql": "^2.5.4"
   },
