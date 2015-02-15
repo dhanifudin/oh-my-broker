@@ -1,0 +1,13 @@
+{
+  "id": "ohmytrack",
+  "stats": false,
+  "port": 1883,
+  "backend": {
+    "type": "mongo",
+    "url": "mongodb://localhost:27017/ohmytrack",
+    "pubsubCollection": "tracks",
+    "mongo": {}
+  },
+  "publishNewClient": false,
+  "subscribedNewClient": false
+}
