@@ -5,7 +5,7 @@
   "backend": {
     "type": "mongo",
     "url": "mongodb://localhost:27017/ohmytrack",
-    "pubsubCollection": "ascoltatori",
+    "pubsubCollection": "pubsub",
     "mongo": {}
   },
   "publishNewClient": false,

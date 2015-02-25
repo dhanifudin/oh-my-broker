@@ -104,5 +104,5 @@ module.exports = function(grunt) {
     /* }}} nodemon */
   });
   grunt.registerTask('default', ['bower_concat', 'concat', 'uglify', 'stylus']);
-  grunt.registerTask('dev', ['bower_concat', 'concat']);
+  grunt.registerTask('dev', ['bower_concat', 'less', 'concat']);
 };

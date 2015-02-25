@@ -2,4 +2,5 @@ bower_components/
 node_modules/
 public/css/
 public/js/
+database.json
 test.js
