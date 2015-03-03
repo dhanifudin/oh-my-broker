@@ -1,21 +1,27 @@
 'use strict';
 
 angular.module('omtApp', [
-  'ngSanitize',
-  'ui.bootstrap',
-  'ui.select',
+  'ngMaterial',
+  'ngMdIcons',
   'ui.router',
   'leaflet-directive',
   'omt.controllers'
 ])
-.config(['$stateProvider', '$urlRouterProvider', config]);
+.config(['$mdThemingProvider', '$stateProvider', '$urlRouterProvider', config])
+.run(['$rootScope', '$state', function($rootScope, $state) {
+  $rootScope.$state = $state;
+}]);
 
-function config($stateProvider, $urlRouterProvider) {
+function config($mdThemingProvider, $stateProvider, $urlRouterProvider) {
+  $mdThemingProvider.theme('default')
+    .primaryPalette('blue')
+    .accentPalette('light-blue');
+
   $urlRouterProvider.otherwise('/');
 
   $stateProvider
 
-  .state('main', {
+  .state('tracking', {
     url: '/',
     templateUrl: 'partials/main.html',
     controller: 'MainCtrl'

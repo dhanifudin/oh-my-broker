@@ -1,29 +1,55 @@
 <!DOCTYPE html>
-<html ng-app="omtApp">
+<html ng-app="omtApp" ng-controller="AppCtrl as app">
   <head>
     <title>Oh My Track | Web Client</title>
     <meta charset="utf-8"/>
     <link rel="stylesheet" href="css/assets.css">
     <link rel="stylesheet" href="css/style.css">
   </head>
-  <body>
+  <body layout="row">
 
-    <header>
-      <nav class="navbar navbar-inverse">
-        <div class="container">
-          <div class="navbar-header">
-            <a class="navbar-brand" href="/">Oh My Track</a>
-          </div>
-
-          <ul class="nav navbar-nav navbar-right">
-            <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="location">Location</a></li>
-          </ul>
+    <!-- Left Sidebar Menu {{{ -->
+    <md-sidenav ng-show="app.isTrackingState()"
+      class="md-sidenav-left md-whiteframe-z2"
+      md-component-id="left"
+      md-is-locked-open="$media('gt-sm')">
+      <md-toolbar>
+        <div class="md-toolbar-tools" ng-click="app.closeMenu()">
+          <button class="menu-icon" aria-label="Close Menu" ng-click="app.closeMenu()">
+            <ng-md-icon icon="arrow_back"></ng-md-icon>
+          </button>
+          <h1>Menu</h1>
         </div>
-      </nav>
-    </header>
+      </md-toolbar>
+      <!-- <div ng-include="'partials/includes/menu-location.html'"></div> -->
+    </md-sidenav>
+    <!-- }}} Left Sidebar Menu -->
 
-    <div ui-view style="height: 100%"></div>
+    <!-- Main Content {{{ -->
+    <div layout="column" tabIndex="-1" role="main" flex>
+
+      <!-- Header {{{ -->
+      <md-toolbar>
+        <div class="md-toolbar-tools">
+          <button class="menu-icon" ng-show="app.isTracking()"
+            aria-label="Toggle Menu" ng-click="app.toggleMenu()">
+            <ng-md-icon icon="menu"></ng-md-icon>
+          </button>
+          <div layout="row" flex class="fill-height">
+            <div class="md-toolbar-item">
+              <a ui-sref="tracking">Tracking</a>
+            </div>
+            <div class="md-toolbar-item">
+              <a ui-sref="location">Location</a>
+            </div>
+          </div>
+        </div>
+      </md-toolbar>
+      <!-- }}} Header -->
+
+      <md-content class="md-padding" flex ui-view style="height:100%;"></md-content>
+    </div>
+    <!-- }}} Main Content -->
 
     <script src="/mqtt.js"></script>
     <script src="js/lib.js"></script>

@@ -1,3 +1,19 @@
-<div id="wrapper">
-  <h1>Location</h1>
-</div>
+<md-sidenav
+  class="md-sidenav-right md-whiteframe-z2"
+  md-component-id="right">
+
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <button
+        class="menu-icon"
+        aria-label="Close Menu"
+        ng-click="app.closeRightMenu()">
+        <ng-md-icon icon="arrow_back"></ng-md-icon>
+      </button>
+      <h1>Menu</h1>
+    </div>
+  </md-toolbar>
+</md-sidenav>
+
+<leaflet center="its" controls="controls"></leaflet>
+

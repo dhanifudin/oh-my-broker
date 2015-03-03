@@ -1,0 +1,33 @@
+<md-content class="md-padding" ng-controller="MenuLocationCtrl as menu">
+  <form name="locationForm">
+    <div layout="column">
+      <md-input-container>
+        <label>Name</label>
+        <input ng-model="location.name" placeholder="Insert location name">
+      </md-input-container>
+      <md-select ng-model="location.level">
+        <md-select-label>
+          {{ location.level ? 'Level: ' + location.level.name : 'Select level' }}
+        </md-select-label>
+        <md-option ng-value="level" ng-repeat="level in menu.levels">
+          {{level.name}}
+        </md-option>
+      </md-select>
+      <div layout="column">
+        <md-select ng-model="location.parent" md-on-open="menu.loadParents()">
+          <md-select-label>
+            {{ location.parent ? 'Parent: ' + location.parent.name : 'Select parent' }}
+          </md-select-label>
+          <md-option ng-value="parent" ng-repeat="parent in menu.parents">
+            {{parent.name}}
+          </md-option>
+        </md-select>
+      </div>
+      <div layout="row" layout-sm="column" layout-align="end center">
+        <md-button class="md-raised md-warn">Cancel</md-button>
+        <md-button class="md-raised md-primary">Save</md-button>
+      </div>
+        {{location}}
+    </div>
+  </form>
+</md-content>

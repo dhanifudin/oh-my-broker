@@ -1,0 +1,41 @@
+<md-dialog aria-label="Please Insert Location Information">
+  <md-content>
+    <md-subheader class="md-sticky-no-effect">
+      Location Name
+    </md-subheader>
+    <div layout="column">
+      <md-input-container>
+        <label>Name</label>
+        <input ng-model="dialog.location.name" placeholder="Insert location name">
+      </md-input-container>
+      <label>{{dialog.location.level}}</label>
+      <md-select ng-model="dialog.location.level">
+        <md-select-label>
+          {{ dialog.location.level ? 'Level: ' + dialog.location.level.name : 'Select level' }}
+        </md-select-label>
+        <md-option ng-value="level" ng-repeat="level in dialog.levels">
+          {{level.name}}
+        </md-option>
+      </md-select>
+      <div layout="column">
+        <md-select ng-model="location.parent" md-on-open="dialog.loadParents()">
+          <md-select-label>
+            {{ location.parent ? 'Parent: ' + location.parent.name : 'Select parent' }}
+          </md-select-label>
+          <md-option ng-value="parent" ng-repeat="parent in dialog.parents">
+            {{parent.name}}
+          </md-option>
+        </md-select>
+      </div>
+      {{dialog.location}}
+    </div>
+  </md-content>
+  <div class="md-actions" layout="row">
+    <md-button class="md-raised md-warn"ng-click="dialog.cancel()">
+      Cancel
+    </md-button>
+    <md-button class="md-raised md-primary" ng-click="dialog.answer('save')">
+      Save
+    </md-button>
+  </div>
+</md-dialog>

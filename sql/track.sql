@@ -43,6 +43,7 @@ DROP TABLE IF EXISTS `location`;
 
 CREATE TABLE `location`(
   `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `code` VARCHAR(20) NULL,
   `name` VARCHAR(50) NULL,
   `level_id` INT NOT NULL,
   `parent_id` INT NULL,

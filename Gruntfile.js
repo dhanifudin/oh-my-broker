@@ -11,12 +11,17 @@ module.exports = function(grunt) {
           'leaflet.draw': [
             'dist/leaflet.draw.css',
             'dist/leaflet.draw.js'
+          ],
+          'Leaflet.label': [
+            'dist/leaflet.label.css',
+            'dist/leaflet.label.js'
           ]
         },
         exclude: [
-          'jquery',
-          'bootstrap'
         ],
+        dependencies: {
+          'Leaflet.label': 'leaflet'
+        },
         bowerOptions: {
           relative: false
         }

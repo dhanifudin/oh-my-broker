@@ -1,5 +1,49 @@
-angular.module('omt.services', [])
+/* Services Declaration {{{ */
+angular.module('omt.services', ['ngResource'])
+.factory('sharedLocation', sharedLocation)
+.factory('rest', ['$resource', rest])
 .factory('mqttService', ['$rootScope', mqttService]);
+/* }}} Services Declaration */
+
+/* sharedLocation {{{ */
+function sharedLocation() {
+  var location = {};
+  var layers = {};
+  var layer = {};
+
+  return {
+    location: location,
+    layers: layers,
+    layer: layer
+  };
+}
+/* }}} sharedLocation */
+
+/* rest {{{ */
+function rest($resource) {
+  var level = $resource(
+    '/api/levels/:id', { id: '@_id' }, {
+      'index': { method: 'GET', isArray: true }
+    }
+  );
+
+  var location = $resource(
+    '/api/locations/:id', { id: '@_id' }, {
+      'create': { method: 'POST' },
+      'index': { method: 'GET', isArray: true },
+      'parent': { method: 'GET', isArray: true },
+      'show': { method: 'GET', isArray: false },
+      'update': { method: 'PUT' },
+      'destroy': { method: 'DELETE' }
+    }
+  );
+
+  return {
+    level: level,
+    location: location
+  };
+}
+/* }}} rest */
 
 /* mqttService {{{ */
 function mqttService($rootScope) {
@@ -11,7 +55,7 @@ function mqttService($rootScope) {
       };
       return mqtt.connect(options);
     }
-  }
+  };
 
   /* var service = { */
   /*   connect: connect */
