@@ -14,12 +14,12 @@ router.get('/', function(req, res, next) {
   );
 });
 
-router.get('/parent/:id', function(req, res, next) {
+router.get('/parents/:id', function(req, res, next) {
   var data = [
     req.params.id
   ];
   persistence.execute(
-    'SELECT * FROM location WHERE level_id = ?',
+    'SELECT id, name FROM location WHERE level_id = ?',
     data,
     function(err, rows) {
       res.json(rows);
@@ -29,15 +29,17 @@ router.get('/parent/:id', function(req, res, next) {
 
 router.post('/', function(req, res, next) {
   var data = [
+    req.body.code,
     req.body.name,
     req.body.level.id,
-    req.body.parent,
+    (req.body.parent) ? req.body.parent.id : null,
     req.body.geo,
     req.body.geo
   ];
   console.log(data);
   persistence.execute(
-    'INSERT INTO location set name = ?, level_id = ?, parent_id = ?, geo = PolyFromText(?), center = Centroid(PolyFromText(?))',
+    'INSERT INTO location set code = ?, name = ?, level_id = ?, parent_id = ?,\
+    geo = PolyFromText(?), center = Centroid(PolyFromText(?))',
     data,
     function(err, rows) {
       res.json(rows);
@@ -46,4 +48,3 @@ router.post('/', function(req, res, next) {
 });
 
 module.exports = router;
-

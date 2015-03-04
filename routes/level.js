@@ -7,9 +7,12 @@ router.get('/', function(req, res) {
     'SELECT * FROM level WHERE id <> 1',
     null,
     function(err, rows) {
-      if (err)
-        console.log('Error selecting: %s', err);
-      res.json(rows);
+      if (err) {
+        console.error('Error selecting: %s', err);
+      }
+      else {
+        res.json(rows);
+      }
     }
   );
 });

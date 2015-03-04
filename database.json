@@ -3,5 +3,5 @@
   "user": "icub",
   "password": "database",
   "database": "ohmytrack",
-  "debug": true
+  "debug": false
 }

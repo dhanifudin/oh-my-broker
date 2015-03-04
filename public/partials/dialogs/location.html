@@ -1,9 +1,13 @@
 <md-dialog aria-label="Please Insert Location Information">
   <md-content>
     <md-subheader class="md-sticky-no-effect">
-      Location Name
+      <h2>Location</h2>
     </md-subheader>
     <div layout="column">
+      <md-input-container>
+        <label>Code</label>
+        <input ng-model="dialog.location.code" placeholder="Insert location code">
+      </md-input-container>
       <md-input-container>
         <label>Name</label>
         <input ng-model="dialog.location.name" placeholder="Insert location name">
@@ -17,16 +21,14 @@
           {{level.name}}
         </md-option>
       </md-select>
-      <div layout="column">
-        <md-select ng-model="location.parent" md-on-open="dialog.loadParents()">
-          <md-select-label>
-            {{ location.parent ? 'Parent: ' + location.parent.name : 'Select parent' }}
-          </md-select-label>
-          <md-option ng-value="parent" ng-repeat="parent in dialog.parents">
-            {{parent.name}}
-          </md-option>
-        </md-select>
-      </div>
+      <md-select ng-model="dialog.location.parent" md-on-open="dialog.loadParents()">
+        <md-select-label>
+          {{ dialog.location.parent ? 'Parent: ' + dialog.location.parent.name : 'Select parent' }}
+        </md-select-label>
+        <md-option ng-value="parent" ng-repeat="parent in dialog.parents">
+          {{parent.name}}
+        </md-option>
+      </md-select>
       {{dialog.location}}
     </div>
   </md-content>

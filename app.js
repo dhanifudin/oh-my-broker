@@ -20,8 +20,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routing
 var location = require('./routes/location');
 var level = require('./routes/level');
+var parent = require('./routes/parent');
 app.use('/api/levels', level);
 app.use('/api/locations', location);
+app.use('/api/parents', parent);
 /* }}} ExpressJS configuration */
 
 moscaHandler.attachServer(httpServer, 8000);

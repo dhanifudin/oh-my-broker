@@ -1,7 +1,7 @@
 /* Controllers Declaration {{{ */
 angular.module('omt.controllers', ['omt.services'])
 .controller('DialogCtrl', [
-  '$scope',
+  '$timeout',
   '$mdDialog',
   'sharedLocation',
   'rest',
@@ -149,7 +149,7 @@ function mainCtrl($rootScope, $scope, mqttService) {
 }/* }}} Tracking Controller */
 
 /* Location Controller {{{ */
-function locationCtrl($scope, $mdDialog, leafletData, sharedLocation) {
+function locationCtrl($scope, $mdDialog, leafletData, shared) {
   angular.extend($scope, {
     its: {
       lat: -7.27956,
@@ -166,36 +166,60 @@ function locationCtrl($scope, $mdDialog, leafletData, sharedLocation) {
     }
   });
 
+  var that = this;
+
+  this.location = shared.location;
+
+  this.polygonToText = function(geojson) {
+    var coordinates = [];
+    geojson.geometry.coordinates[0].forEach(function(geo) {
+      coordinates.push(geo.join(' '));
+    });
+    return 'POLYGON((' + coordinates.join(', ') + '))';
+  }
+
   leafletData.getMap().then(function(map) {
     var drawnItems = $scope.controls.edit.featureGroup;
 
     map.on('draw:created', function(e) {
       var layer = e.layer;
+      shared.location.geo = that.polygonToText(layer.toGeoJSON());
       $mdDialog.show({
         controller: 'DialogCtrl as dialog',
         templateUrl: 'partials/dialogs/location.html',
       })
       .then(function(answer) {
-        console.log(sharedLocation.location);
-        layer.bindLabel(sharedLocation.location.name).addTo(map);
+        layer.bindLabel(shared.location.name).addTo(map);
         drawnItems.addLayer(layer);
-        console.log(layer.getLatLngs());
+        shared.location = {};
       }, function() {
         console.log('You canceled the dialog.');
+        shared.location = {};
       });
+    });
+
+    map.on('click', function(e) {
+      console.log(e.latlng)
     });
   });
 }
 /* }}} Location Controller */
 
 /* Dialog Controller {{{ */
-function dialogCtrl($scope, $mdDialog, sharedLocation, rest) {
+function dialogCtrl($timeout, $mdDialog, shared, rest) {
 
-  this.location = sharedLocation.location;
+  var that = this;
+
+  this.location = shared.location;
 
   this.levels = rest.level.index();
 
-  this.parents = rest.location.parent();
+  this.loadParents = function() {
+    that.parents = [];
+    return $timeout(function() {
+      that.parents = rest.parent.show({id: shared.location.level.id + 1});
+    }, 650);
+  };
 
   this.hide = function() {
     $mdDialog.hide();
@@ -206,8 +230,6 @@ function dialogCtrl($scope, $mdDialog, sharedLocation, rest) {
   };
 
   this.answer = function(answer) {
-    console.log(this.location);
-    /* console.log(sharedLocation.location); */
     function success(response) {
       console.log('success', response);
       $mdDialog.hide(answer);
@@ -217,8 +239,7 @@ function dialogCtrl($scope, $mdDialog, sharedLocation, rest) {
       console.log('failure', response);
     }
 
-    rest.location.create(this.location, success, failure);
-    /* $mdDialog.hide(answer); */
+    rest.location.create(shared.location, success, failure);
   };
 }
 /* }}} Dialog Controller */

@@ -38,9 +38,17 @@ function rest($resource) {
     }
   );
 
+  var parent = $resource(
+    '/api/parents/:id', { id: '@_id' }, {
+      'index': { method: 'GET', isArray: true },
+      'show': {method: 'GET', isArray: true}
+    }
+  );
+
   return {
     level: level,
-    location: location
+    location: location,
+    parent: parent
   };
 }
 /* }}} rest */
