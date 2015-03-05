@@ -1,5 +1,5 @@
 /* Modules declaration {{{ */
-var moscaHandler = require('./lib/mosca_handler');
+var broker = require('./lib/broker');
 var express = require('express');
 var http = require('http');
 var path = require('path');
@@ -26,4 +26,4 @@ app.use('/api/locations', location);
 app.use('/api/parents', parent);
 /* }}} ExpressJS configuration */
 
-moscaHandler.attachServer(httpServer, 8000);
+broker.attachServer(httpServer, 8000);

@@ -2,7 +2,6 @@
 
 angular.module('omtApp', [
   'ngMaterial',
-  'ngMdIcons',
   'ui.router',
   'leaflet-directive',
   'omt.controllers'
