@@ -1,10 +1,11 @@
 /* Controllers Declaration {{{ */
 angular.module('omt.controllers', ['omt.services'])
+
 .controller('DialogCtrl', [
   '$timeout',
   '$mdDialog',
-  'sharedLocation',
-  'rest',
+  '$data',
+  '$rest',
   dialogCtrl
 ])
 
@@ -13,69 +14,108 @@ angular.module('omt.controllers', ['omt.services'])
   '$state',
   '$timeout',
   '$mdSidenav',
+  '$mqtt',
+  '$data',
   appCtrl
 ])
 
 .controller('MenuLocationCtrl', [
   '$scope',
   '$timeout',
-  'sharedLocation',
-  'rest',
+  '$data',
+  '$rest',
   menuLocationCtrl
 ])
 
 .controller('MainCtrl', [
   '$rootScope',
   '$scope',
-  'mqttService',
+  '$mqtt',
   mainCtrl
 ])
 
-.controller('LocationCtrl', [
+.controller('MarkerCtrl', [
   '$scope',
   '$mdDialog',
   'leafletData',
-  'sharedLocation',
-  locationCtrl
+  '$data',
+  markerCtrl
 ]);
-
 /* }}} Controller Declarations */
 
 /* Application Controller {{{ */
-function appCtrl($scope, $state, $timeout, $mdSidenav) {
+function appCtrl($scope, $state, $timeout, $mdSidenav, $mqtt, $data) {
 
-  this.isLockedOpen = function() {
-    return $state.current.name === 'location' ? '$media(\'gt-sm\')' : false;
+  this.tracking = $data.tracking;
+  this.marker = $data.marker;
+  this.local = $data.local;
+  this.session = $data.session;
+
+  this.isShow = function() {
+    return this.isJoined() && this.isTracking();
   };
 
-  this.isTrackingState = function() {
+  this.isJoined = function() {
+    return this.local.tracking.joined;
+  };
+
+  this.isTracking = function() {
     return ($state.current.name === 'tracking');
   };
 
-  this.locationState = function() {
-    return ($state.current.name === 'location');
+  this.isMarker = function() {
+    return ($state.current.name === 'marker');
   };
 
-  this.toggleMenu = function() {
+  this.connect = function() {
+    /* this.local.tracking.client = $mqtt.connect(this.tracking.username); */
+    /* this.local.tracking.joined = true; */
+    /* this.local.tracking.client.on('message', function(topic, payload) { */
+    /*   console.log([topic, payload].join(': ')); */
+    /* }); */
+    var client = $mqtt.connect(this.tracking.username);
+    client.subscribe(this.tracking.username);
+  };
+
+  this.clear = function() {
+    this.tracking.username = '';
+  };
+
+  this.disconnect = function() {
+    this.local.tracking.joined = false;
+  };
+
+  this.toggleLeftMenu = function() {
     $timeout(function() {
       $mdSidenav('left').toggle();
     });
   };
 
-  this.closeMenu = function() {
+  this.closeLeftMenu = function() {
     $timeout(function() {
       $mdSidenav('left').close();
     });
   };
 
+  this.toggleRightMenu = function() {
+    $timeout(function() {
+      $mdSidenav('right').toggle();
+    });
+  };
+
+  this.closeRightMenu = function() {
+    $timeout(function() {
+      $mdSidenav('right').close();
+    });
+  };
 }
 /* }}} Application Controller */
 
 /* Menu Location Controller {{{ */
-function menuLocationCtrl($scope, $timeout, sharedLocation, rest) {
+function menuLocationCtrl($scope, $timeout, $data, rest) {
   var ctrl = this;
 
-  $scope.location = sharedLocation.location;
+  $scope.location = $data.location;
 
   this.levels = rest.level.index();
 
@@ -97,7 +137,7 @@ function menuLocationCtrl($scope, $timeout, sharedLocation, rest) {
 /* }}} Menu Location Controller */
 
 /* Tracking Controller {{{ */
-function mainCtrl($rootScope, $scope, mqttService) {
+function mainCtrl($rootScope, $scope, $mqtt) {
 
   angular.extend($scope, {
     its: {
@@ -109,47 +149,47 @@ function mainCtrl($rootScope, $scope, mqttService) {
     events: {}
   });
 
-  $scope.track = {
-    client: null,
+  /* $scope.track = { */
+  /*   client: null, */
 
-    status: {
-      error: null,
-      started: false
-    },
+  /*   status: { */
+  /*     error: null, */
+  /*     started: false */
+  /*   }, */
 
-    data: {
-      username: null
-    }
-  };
+  /*   data: { */
+  /*     username: null */
+  /*   } */
+  /* }; */
 
-  $scope.init = function() {
-    if ($scope.username) {
-      var client = mqttService.mqtt($scope.username);
-      client.subscribe($scope.username);
+  /* $scope.init = function() { */
+  /*   if ($scope.username) { */
+  /*     var client = mqttService.mqtt($scope.username); */
+  /*     client.subscribe($scope.username); */
 
-      client.on('message', $scope.onMessage);
+  /*     client.on('message', $scope.onMessage); */
 
-      $scope.track.client = client;
-      $scope.track.status.joined = true;
-    }
-  };
+  /*     $scope.track.client = client; */
+  /*     $scope.track.status.joined = true; */
+  /*   } */
+  /* }; */
 
-  $scope.onMessage = function(topic, payload) {
-    console.log([topic, payload].join(": "));
-  };
+  /* $scope.onMessage = function(topic, payload) { */
+  /*   console.log([topic, payload].join(": ")); */
+  /* }; */
 
-  $scope.subscribe = function(topic) {
-    $scope.track.client.subscribe(topic);
-  };
+  /* $scope.subscribe = function(topic) { */
+  /*   $scope.track.client.subscribe(topic); */
+  /* }; */
 
-  $scope.unsubscribe = function(topic) {
-    $scope.track.client.unsubscribe(topic);
-  }
+  /* $scope.unsubscribe = function(topic) { */
+  /*   $scope.track.client.unsubscribe(topic); */
+  /* } */
 
 }/* }}} Tracking Controller */
 
-/* Location Controller {{{ */
-function locationCtrl($scope, $mdDialog, leafletData, shared) {
+/* Marker Controller {{{ */
+function markerCtrl($scope, $mdDialog, leafletData, data) {
   angular.extend($scope, {
     its: {
       lat: -7.27956,
@@ -168,7 +208,7 @@ function locationCtrl($scope, $mdDialog, leafletData, shared) {
 
   var that = this;
 
-  this.location = shared.location;
+  this.location = data.marker.location;
 
   this.polygonToText = function(geojson) {
     var coordinates = [];
@@ -203,7 +243,7 @@ function locationCtrl($scope, $mdDialog, leafletData, shared) {
     });
   });
 }
-/* }}} Location Controller */
+/* }}} Marker Controller */
 
 /* Dialog Controller {{{ */
 function dialogCtrl($timeout, $mdDialog, shared, rest) {

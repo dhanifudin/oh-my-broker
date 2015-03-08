@@ -8,6 +8,5 @@
     "pubsubCollection": "pubsub",
     "mongo": {}
   },
-  "publishNewClient": false,
-  "subscribedNewClient": false
+  "publishNewClient": false
 }

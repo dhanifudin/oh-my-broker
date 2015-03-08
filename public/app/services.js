@@ -1,23 +1,46 @@
 /* Services Declaration {{{ */
-angular.module('omt.services', ['ngResource'])
-.factory('sharedLocation', sharedLocation)
-.factory('rest', ['$resource', rest])
-.factory('mqttService', ['$rootScope', mqttService]);
+angular.module('omt.services', ['ngResource', 'ngStorage'])
+.factory('$data', [
+  '$localStorage',
+  '$sessionStorage',
+  data
+])
+.factory('$rest', [
+  '$resource',
+  rest
+])
+.factory('$mqtt', [
+  '$rootScope',
+  '$data',
+  mqttService
+]);
 /* }}} Services Declaration */
 
-/* sharedLocation {{{ */
-function sharedLocation() {
-  var location = {};
-  var layers = {};
-  var layer = {};
+/* data {{{ */
+function data($localStorage, $sessionStorage) {
+
+  var tracking = {};
+  var marker = {};
+
+  $localStorage.$default({
+    tracking: {},
+    marker: {}
+  });
+
+  $sessionStorage.$default({
+    tracking: {},
+    marker: {}
+  });
 
   return {
-    location: location,
-    layers: layers,
-    layer: layer
+    tracking: tracking,
+    marker: marker,
+    local: $localStorage,
+    session: $sessionStorage
   };
+
 }
-/* }}} sharedLocation */
+/* }}} data */
 
 /* rest {{{ */
 function rest($resource) {
@@ -54,46 +77,63 @@ function rest($resource) {
 /* }}} rest */
 
 /* mqttService {{{ */
-function mqttService($rootScope) {
+function mqttService($rootScope, $data) {
 
-  return {
-    mqtt: function(username) {
+  var local = $data.local;
+  var session = $data.session;
+
+  /* return { */
+  /*   mqtt: function(username) { */
+  /*     var options = { */
+  /*       clientId: 'webtrack_' + username */
+  /*     }; */
+  /*     return mqtt.connect(options); */
+  /*   } */
+  /* }; */
+
+  var service = {
+    connect: function(username) {
       var options = {
         clientId: 'webtrack_' + username
       };
       return mqtt.connect(options);
-    }
+    },
+    publish: publish,
+    subscribe: subscribe,
+    unsubscribe: unsubscribe
   };
 
-  /* var service = { */
-  /*   connect: connect */
-  /*   publish: publish, */
-  /*   subscribe: subscribe, */
-  /*   unsubscribe: unsubscribe */
-  /* }; */
-
-  function connect() {
-    var client = mqtt.connect();
-    client.on('message', function(topic, payload) {
-      $rootScope.$broadcast('trackEvent', {
-        topic: topic,
-        message: payload
-      });
-    });
-  }
+  /* function connect(username) { */
+  /*   var options = { */
+  /*     clientId: 'webtrack_' + username */
+  /*   }; */
+  /*   return mqtt.connect(options); */
+    /* local.tracking.client.on('message', function(topic, payload) { */
+    /*   $rootScope.$broadcast('trackEvent', { */
+    /*     topic: topic, */
+    /*     message: payload */
+    /*   }); */
+    /* }); */
+  /* } */
 
   function publish(topic, message) {
-    client.publish(topic, message);
+    if (typeof(local.tracking.client) != 'undefined') {
+      local.tracking.client.publish(topic, message);
+    }
   }
 
   function subscribe(topic) {
-    client.subscribe(topic);
+    if (typeof(local.tracking.client) != 'undefined') {
+      local.tracking.client.subscribe(topic);
+    }
   }
 
   function unsubscribe(topic) {
-    client.unsubscribe(topic);
+    if (typeof(local.tracking.client) != 'undefined') {
+      local.tracking.client.unsubscribe(topic);
+    }
   }
 
-  /* return service; */
+  return service;
 }
 /* }}} mqttService */

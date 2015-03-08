@@ -1,4 +1,22 @@
-<!-- <div ng-include="'partials/includes/login.html'"></div> -->
+  <section ng-hide="app.isShow()" class="container" layout="row" layout-sm="column">
+    <div layout="column" flex="40" offset="30">
+      <md-toolbar>
+        <div class="md-toolbar-tools">
+          <h1>Connect</h1>
+        </div>
+      </md-toolbar>
+      <md-content class="md-padding md-whiteframe-z1">
+        <md-input-container flex>
+          <label>Username</label>
+          <input ng-model="app.tracking.username" placeholder="Please insert your username">
+        </md-input-container>
+        <div class="md-actions" layout="row" layout-sm="column" layout-align="end center">
+          <md-button class="md-raised md-warn" ng-click="app.clear()">Clear</md-button>
+          <md-button class="md-raised md-primary" ng-click="app.connect()">Connect</md-button>
+        </div>
+      </md-content>
+    </div>
+  </section>
 
-<div class="layout-content" layout-fill layout="column">
-</div>
+  <leaflet ng-show="app.isShow()" center="its"></leaflet>
+<!-- <div class="layout-content" layout-fill layout="column"></div> -->

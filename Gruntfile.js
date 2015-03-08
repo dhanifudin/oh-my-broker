@@ -18,6 +18,7 @@ module.exports = function(grunt) {
           ]
         },
         exclude: [
+          'font-awesome'
         ],
         dependencies: {
           'Leaflet.label': 'leaflet'
