@@ -1,0 +1,28 @@
+<md-dialog
+  aria-label="Please Insert Location Information">
+  <md-content>
+    <md-subheader class="md-sticky-no-effect">
+      <h2>Location</h2>
+    </md-subheader>
+    <div layout="column">
+      <md-input-container>
+        <label>Code</label>
+        <input ng-model="dialog.location.code" placeholder="Insert Location Code"></input>
+      </md-input-container>
+    </div>
+  </md-content>
+  <div layout="row"
+    class="md-actions">
+    <md-button
+      class="md-raised md-warn"
+      ng-click="dialog.cancel()">
+      Cancel
+    </md-button>
+    <md-button
+      class="md-raised md-warn"
+      ng-click="dialog.save()">
+      Save
+    </md-button>
+  </div>
+</md-dialog>
+

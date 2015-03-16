@@ -29,6 +29,19 @@ body > div {
   padding: 0;
 }
 
+.tab {
+  .tabpanel-container {
+    display: block;
+    position: relative;
+    background: white;
+    border: 0px solid black;
+    overflow: hidden;
+    [role="tabpanel"] {
+      padding: 20px;
+    }
+  }
+}
+
 .angular-leaflet-map {
   height: 100%;
 }

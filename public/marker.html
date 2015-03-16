@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html ng-app="markerApp" ng-controller="AppCtrl as app">
+  <head>
+    <title>Oh My Track | Marker Application</title>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="css/marker/assets.css">
+    <link rel="stylesheet" href="css/marker/style.css">
+  </head>
+  <body layout="row">
+
+    <!-- Main Content {{{ -->
+    <div
+      layout="column"
+      tabIndex="-1"
+      role="main"
+      flex>
+      <md-toolbar>
+        <div class="md-toolbar-tools">
+          <div
+            layout="row"
+            class="fill-height"
+            flex>
+            <h1>Marker</h1>
+          </div>
+        </div>
+      </md-toolbar>
+
+      <md-content
+        style="height: 100%;"
+        flex>
+        <leaflet center="its" controls="controls"></leaflet>
+      </md-content>
+    </div>
+    <!-- }}} Main Content -->
+
+    <script src="js/marker/lib.js"></script>
+    <script src="app/marker/app.js"></script>
+    <script src="app/marker/controllers.js"></script>
+    <script src="app/marker/services.js"></script>
+  </body>
+</html>

@@ -9,10 +9,10 @@
   <body layout="row">
 
     <!-- Left Sidebar Menu {{{ -->
-    <md-sidenav ng-show="app.isShow()"
+    <md-sidenav
       class="md-sidenav-left md-whiteframe-z2"
       md-component-id="left"
-      md-is-locked-open="$media('gt-md')">
+      md-is-locked-open="$mdMedia('gt-md')">
       <md-toolbar>
         <div class="md-toolbar-tools"
           ng-click="app.closeMenu()">
@@ -23,23 +23,49 @@
           <h1>Menu</h1>
         </div>
       </md-toolbar>
-      <md-content flex>
-        <ul>
-          <li>
-            <button
-              ng-click="app.toggleRightMenu()">
-              Show Tracking
-            </button>
-          </li>
-          <li>
-            <button
-              ng-click="app.disconnect()">
-              Disconnect
-            </button>
-          </li>
-        </ul>
-        {{app.local.tracking.client}}
-      </md-content>
+      <div ng-controller="TabCtrl as tab" class="tab">
+        <md-tabs class="md-accent" md-selected="tab.selectedIndex">
+          <md-tab id="tab1" aria-controls="tab1-content">
+            Menu
+          </md-tab>
+          <md-tab id="tab2" aria-controls="tab2-content">
+            Track
+          </md-tab>
+          <md-tab id="tab3" aria-controls="tab3-content">
+            Debug
+          </md-tab>
+        </md-tabs>
+        <ng-switch on="tab.selectedIndex" class="tabpanel-container">
+          <div role="tabpanel"
+            id="tab1-content"
+            aria-labelledby="tab1"
+            ng-switch-when="0"
+            md-swipe-left="tab.next()"
+            md-swipe-right="tab.previous()" >
+            <ul>
+              <li><button ng-click="app.disconnect()">Disconnect</button></li>
+            </ul>
+          </div>
+          <div role="tabpanel"
+            id="tab2-content"
+            aria-labelledby="tab2"
+            ng-switch-when="1"
+            md-swipe-left="tab.next()"
+            md-swipe-right="tab.previous()" >
+            Track
+          </div>
+          <div role="tabpanel"
+            id="tab3-content"
+            aria-labelledby="tab3"
+            ng-switch-when="2"
+            md-swipe-left="tab.next()"
+            md-swipe-right="tab.previous()" >
+<pre>
+{{$data | dump}}
+</pre>
+          </div>
+        </ng-switch>
+      </div>
     </md-sidenav>
     <!-- }}} Left Sidebar Menu -->
 
@@ -86,9 +112,9 @@
     <!-- }}} Main Content -->
 
     <script src="/mqtt.js"></script>
-    <script src="js/lib.js"></script>
-    <script src="app/app.js"></script>
-    <script src="app/controllers.js"></script>
-    <script src="app/services.js"></script>
+    <script src="js/tracking/lib.js"></script>
+    <script src="app/tracking/app.js"></script>
+    <script src="app/tracking/controllers.js"></script>
+    <script src="app/tracking/services.js"></script>
   </body>
 </html>

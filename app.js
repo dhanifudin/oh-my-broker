@@ -1,3 +1,5 @@
+/* vim: set foldmethod=marker: */
+
 /* Modules declaration {{{ */
 var broker = require('./lib/broker');
 var express = require('express');
@@ -26,4 +28,4 @@ app.use('/api/locations', location);
 app.use('/api/parents', parent);
 /* }}} ExpressJS configuration */
 
-broker.attachServer(httpServer, 8000);
+broker.attachServer(httpServer);

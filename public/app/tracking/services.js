@@ -21,24 +21,29 @@ function data($localStorage, $sessionStorage) {
 
   var tracking = {};
   var marker = {};
+  var client = null;
 
   $localStorage.$default({
-    tracking: {},
-    marker: {}
+    subscriptions: [],
+    joined: false
   });
 
   $sessionStorage.$default({
-    tracking: {},
-    marker: {}
   });
+
+  function reset() {
+    $localStorage.$reset();
+    client = null;
+  }
 
   return {
     tracking: tracking,
     marker: marker,
-    local: $localStorage,
-    session: $sessionStorage
+    client: client,
+    storage: $localStorage,
+    session: $sessionStorage,
+    reset: reset
   };
-
 }
 /* }}} data */
 
@@ -81,56 +86,64 @@ function mqttService($rootScope, $data) {
 
   var local = $data.local;
   var session = $data.session;
-
-  /* return { */
-  /*   mqtt: function(username) { */
-  /*     var options = { */
-  /*       clientId: 'webtrack_' + username */
-  /*     }; */
-  /*     return mqtt.connect(options); */
-  /*   } */
-  /* }; */
+  var username = $data.username;
 
   var service = {
-    connect: function(username) {
-      var options = {
-        clientId: 'webtrack_' + username
-      };
-      return mqtt.connect(options);
-    },
+    connect: connect,
     publish: publish,
     subscribe: subscribe,
-    unsubscribe: unsubscribe
+    unsubscribe: unsubscribe,
+    end: end,
   };
 
-  /* function connect(username) { */
-  /*   var options = { */
-  /*     clientId: 'webtrack_' + username */
-  /*   }; */
-  /*   return mqtt.connect(options); */
-    /* local.tracking.client.on('message', function(topic, payload) { */
-    /*   $rootScope.$broadcast('trackEvent', { */
-    /*     topic: topic, */
-    /*     message: payload */
-    /*   }); */
-    /* }); */
-  /* } */
+  function connect(username) {
+    var options = {
+      clientId: 'webtrack_' + username
+    };
+    $data.client = mqtt.connect(options);
+    // Listen for event connect
+    $data.client.on('connect', function() {
+      $rootScope.$apply(function() {
+        $data.joined = true;
+      });
+      $data.client.subscribe(username);
+    });
+
+    $data.client.on('message', function(topic, payload) {
+      $rootScope.$broadcast('trackEvent', {
+        topic: topic,
+        message: payload
+      });
+    });
+
+    $data.client.on('close', function() {
+      $rootScope.$apply(function() {
+        $data.joined = false;
+      });
+    });
+  }
 
   function publish(topic, message) {
-    if (typeof(local.tracking.client) != 'undefined') {
-      local.tracking.client.publish(topic, message);
+    if ($data.client !== null) {
+      $data.client.publish(topic, message);
     }
   }
 
   function subscribe(topic) {
-    if (typeof(local.tracking.client) != 'undefined') {
-      local.tracking.client.subscribe(topic);
+    if ($data.client !== null) {
+      $data.client.subscribe(topic);
     }
   }
 
   function unsubscribe(topic) {
-    if (typeof(local.tracking.client) != 'undefined') {
-      local.tracking.client.unsubscribe(topic);
+    if ($data.client !== null) {
+      $data.client.unsubscribe(topic);
+    }
+  }
+
+  function end() {
+    if ($data.client !== null) {
+      $data.client.end();
     }
   }
 

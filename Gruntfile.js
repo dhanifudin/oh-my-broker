@@ -4,9 +4,30 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     /* bower_concat task {{{ */
     bower_concat: {
-      all: {
-        dest: 'public/js/lib.js',
-        cssDest: 'public/css/assets.css',
+      tracking: {
+        dest: 'public/js/tracking/lib.js',
+        cssDest: 'public/css/tracking/assets.css',
+        mainFiles: {
+          'Leaflet.label': [
+            'dist/leaflet.label.css',
+            'dist/leaflet.label.js'
+          ]
+        },
+        exclude: [
+          'font-awesome',
+          'leaflet.draw',
+          'leaflet-routing-machine'
+        ],
+        dependencies: {
+          'Leaflet.label': 'leaflet'
+        },
+        bowerOptions: {
+          relative: false
+        }
+      },
+      marker: {
+        dest: 'public/js/marker/lib.js',
+        cssDest: 'public/css/marker/assets.css',
         mainFiles: {
           'leaflet.draw': [
             'dist/leaflet.draw.css',
@@ -15,6 +36,10 @@ module.exports = function(grunt) {
           'Leaflet.label': [
             'dist/leaflet.label.css',
             'dist/leaflet.label.js'
+          ],
+          'leaflet-routing-machine': [
+            'dist/leaflet-routing-machine.css',
+            'dist/leaflet-routing-machine.js'
           ]
         },
         exclude: [
@@ -36,20 +61,42 @@ module.exports = function(grunt) {
         expand: true,
         flatten: true,
         filter: 'isFile',
+        src: 'bower_components/leaflet/dist/images/*',
+        dest: 'public/img',
+      },
+      draw: {
+        expand: true,
+        flatten: true,
+        filter: 'isFile',
         src: 'bower_components/leaflet.draw/dist/images/*',
-        dest: 'public/css/images/',
+        dest: 'public/css/marker/images',
+      },
+      routing: {
+        expand: true,
+        flatten: true,
+        filter: 'isFile',
+        src: 'bower_components/leaflet-routing-machine/dist/leaflet.routing.icons.png',
+        dest: 'public/css/marker',
       },
     },
     /* }}} copy task */
 
     /* less task {{{ */
     less: {
-      dev: {
+      tracking: {
         options: {
           compress: false
         },
         files: {
-          'public/css/style.css': 'less/style.less'
+          'public/css/tracking/style.css': 'less/tracking/style.less'
+        }
+      },
+      marker: {
+        options: {
+          compress: false
+        },
+        files: {
+          'public/css/marker/style.css': 'less/marker/style.less'
         }
       },
       production: {
@@ -109,6 +156,6 @@ module.exports = function(grunt) {
     }
     /* }}} nodemon */
   });
-  grunt.registerTask('default', ['bower_concat', 'concat', 'uglify', 'stylus']);
+  grunt.registerTask('default', ['bower_concat', 'less']);
   grunt.registerTask('dev', ['bower_concat', 'less', 'concat']);
 };

@@ -1,5 +1,5 @@
 /* Controllers Declaration {{{ */
-angular.module('omt.controllers', ['omt.services'])
+angular.module('omt.controllers', [])
 
 .controller('DialogCtrl', [
   '$timeout',
@@ -17,6 +17,12 @@ angular.module('omt.controllers', ['omt.services'])
   '$mqtt',
   '$data',
   appCtrl
+])
+
+.controller('TabCtrl', [
+  '$scope',
+  '$data',
+  tabCtrl
 ])
 
 .controller('MenuLocationCtrl', [
@@ -56,7 +62,7 @@ function appCtrl($scope, $state, $timeout, $mdSidenav, $mqtt, $data) {
   };
 
   this.isJoined = function() {
-    return this.local.tracking.joined;
+    return $data.joined;
   };
 
   this.isTracking = function() {
@@ -68,21 +74,17 @@ function appCtrl($scope, $state, $timeout, $mdSidenav, $mqtt, $data) {
   };
 
   this.connect = function() {
-    /* this.local.tracking.client = $mqtt.connect(this.tracking.username); */
-    /* this.local.tracking.joined = true; */
-    /* this.local.tracking.client.on('message', function(topic, payload) { */
-    /*   console.log([topic, payload].join(': ')); */
-    /* }); */
-    var client = $mqtt.connect(this.tracking.username);
-    client.subscribe(this.tracking.username);
+    console.log('function connect click');
+    $mqtt.connect($data.storage.username);
   };
 
   this.clear = function() {
-    this.tracking.username = '';
+    delete $data.storage.username;
   };
 
   this.disconnect = function() {
-    this.local.tracking.joined = false;
+    $mqtt.end();
+    $data.reset();
   };
 
   this.toggleLeftMenu = function() {
@@ -135,6 +137,21 @@ function menuLocationCtrl($scope, $timeout, $data, rest) {
 
 }
 /* }}} Menu Location Controller */
+
+/* Tab Controller {{{ */
+function tabCtrl($scope, $data) {
+  this.length = 2;
+  this.selectedIndex = 0;
+
+  this.next = function() {
+    this.selectedIndex = Math.min(this.selectedIndex + 1, length);
+  };
+
+  this.previous = function() {
+    this.selectedIndex = Math.max(this.selectedIndex - 1, 0);
+  };
+}
+/* }}} Tab Controller */
 
 /* Tracking Controller {{{ */
 function mainCtrl($rootScope, $scope, $mqtt) {
