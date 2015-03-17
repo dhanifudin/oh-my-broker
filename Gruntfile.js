@@ -2,6 +2,7 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+
     /* bower_concat task {{{ */
     bower_concat: {
       tracking: {

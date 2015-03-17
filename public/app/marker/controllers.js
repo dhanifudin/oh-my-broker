@@ -7,19 +7,24 @@ angular.module('marker.controllers', [])
   '$mdToast',
   '$timeout',
   '$data',
+  '$rest',
   'leafletData',
   appCtrl
 ])
 
 .controller('LocationDialog', [
   '$mdDialog',
+  '$mdToast',
   '$timeout',
   '$data',
   '$rest',
   locationDialog
 ]);
 
-function appCtrl($rootScope, $scope, $mdDialog, $mdToast, $timeout, $data, leafletData) {
+function appCtrl($rootScope, $scope, $mdDialog, $mdToast, $timeout, $data, $rest, leafletData) {
+
+  var that = this;
+  leafletData.getMap().then(mapHandler);
 
   angular.extend($scope, {
     its: {
@@ -37,8 +42,6 @@ function appCtrl($rootScope, $scope, $mdDialog, $mdToast, $timeout, $data, leafl
     }
   });
 
-  var that = this;
-
   this.showToast = function(message) {
     $mdToast.show(
       $mdToast.simple()
@@ -46,8 +49,6 @@ function appCtrl($rootScope, $scope, $mdDialog, $mdToast, $timeout, $data, leafl
         .hideDelay(2000)
     );
   };
-
-  leafletData.getMap().then(mapHandler);
 
   function mapHandler(map) {
     L.Icon.Default.imagePath = 'img';
@@ -71,7 +72,6 @@ function appCtrl($rootScope, $scope, $mdDialog, $mdToast, $timeout, $data, leafl
 
       function cancel() {
         that.showToast('You canceled the dialog');
-        console.log('You canceled the dialog');
         $data.location = {};
       }
     });
@@ -90,15 +90,29 @@ function appCtrl($rootScope, $scope, $mdDialog, $mdToast, $timeout, $data, leafl
         .ok('Save')
         .cancel('Cancel');
         $mdDialog.show(confirm).then(function() {
-          console.log('Save');
+          if (e.routes.length) {
+            console.log(getCoordinates(e.routes[0].coordinates));
+            $rest.route.create(
+              getCoordinates(e.routes[0].coordinates),
+              function(response) {
+                that.showToast('Success: ' + response);
+              },
+              function(response) {
+                that.showToast('Fail: ' + response);
+              }
+            );
+          } else {
+            that.showToast('Empty routes');
+          }
         }, function() {
-          console.log('Cancel');
+          that.showToast('Cancel');
         });
     });
 
     routing.on('routingerror', function(e) {
       console.log(e);
     });
+
   }
 
   function polygonToText(geojson) {
@@ -106,18 +120,60 @@ function appCtrl($rootScope, $scope, $mdDialog, $mdToast, $timeout, $data, leafl
     geojson.geometry.coordinates[0].forEach(function(geo) {
       coordinates.push(geo.join(' '));
     });
-    return 'POLYGON(' + coordinates.join(', ') + '))';
+    return 'POLYGON((' + coordinates.join(', ') + '))';
+  }
+
+  function getCoordinates(array) {
+    var coordinates = [];
+    array.forEach(function(location) {
+      coordinates.push({
+        lat: location[0],
+        lon: location[1]
+      });
+    });
+    return JSON.stringify({ geos: coordinates });
   }
 
 }
 
-function locationDialog($mdDialog, $timeout, $data, $rest) {
+function locationDialog($mdDialog, $mdToast, $timeout, $data, $rest) {
+
+  var that = this;
+
+  this.location = $data.location;
+
+  this.levels = $rest.level.index();
+
+  this.loadParents = function() {
+    that.parents = [];
+    return $timeout(function() {
+      that.parents = $rest.parent.show({id: $data.location.level.id + 1});
+    }, 650);
+  };
+
+  this.showToast = function(message) {
+    $mdToast.show(
+      $mdToast.simple()
+      .content(message)
+      .hideDelay(2000)
+    );
+  };
 
   this.save = function() {
-    console.log(e);
+    $rest.location.create(
+      $data.location,
+      function(response) {
+        $mdDialog.hide();
+        that.showToast('Success: ' + response);
+      },
+      function(response) {
+        that.showToast('Fail: ' + response);
+      }
+    )
   };
 
   this.cancel = function() {
     $mdDialog.cancel();
   };
+
 }

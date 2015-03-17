@@ -21,9 +21,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routing
 var location = require('./routes/location');
+var routes = require('./routes/routes');
 var level = require('./routes/level');
 var parent = require('./routes/parent');
 app.use('/api/levels', level);
+app.use('/api/routes', routes);
 app.use('/api/locations', location);
 app.use('/api/parents', parent);
 /* }}} ExpressJS configuration */

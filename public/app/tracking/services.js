@@ -1,4 +1,3 @@
-/* Services Declaration {{{ */
 angular.module('omt.services', ['ngResource', 'ngStorage'])
 .factory('$data', [
   '$localStorage',
@@ -14,9 +13,7 @@ angular.module('omt.services', ['ngResource', 'ngStorage'])
   '$data',
   mqttService
 ]);
-/* }}} Services Declaration */
 
-/* data {{{ */
 function data($localStorage, $sessionStorage) {
 
   var tracking = {};
@@ -45,9 +42,7 @@ function data($localStorage, $sessionStorage) {
     reset: reset
   };
 }
-/* }}} data */
 
-/* rest {{{ */
 function rest($resource) {
   var level = $resource(
     '/api/levels/:id', { id: '@_id' }, {
@@ -79,9 +74,7 @@ function rest($resource) {
     parent: parent
   };
 }
-/* }}} rest */
 
-/* mqttService {{{ */
 function mqttService($rootScope, $data) {
 
   var local = $data.local;
@@ -149,4 +142,3 @@ function mqttService($rootScope, $data) {
 
   return service;
 }
-/* }}} mqttService */

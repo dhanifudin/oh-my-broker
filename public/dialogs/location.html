@@ -7,8 +7,41 @@
     <div layout="column">
       <md-input-container>
         <label>Code</label>
-        <input ng-model="dialog.location.code" placeholder="Insert Location Code"></input>
+        <input
+        ng-model="dialog.location.code"
+        placeholder="Insert Location Code"/>
       </md-input-container>
+      <md-input-container>
+        <label>Name</label>
+        <input
+        ng-model="dialog.location.name"
+        placeholder="Insert Location Name"/>
+      </md-input-container>
+      <md-select
+        ng-model="dialog.location.level">
+        <md-select-label>
+          {{dialog.location.level ? 'Level: ' + dialog.location.level.name
+            : 'Select level'}}
+        </md-select-label>
+        <md-option
+          ng-value="level"
+          ng-repeat="level in dialog.levels">
+          {{level.name}}
+        </md-option>
+      </md-select>
+      <md-select
+        ng-model="dialog.location.parent"
+        md-on-open="dialog.loadParents()">
+        <md-select-label>
+          {{dialog.location.parent ? 'Parent: ' + dialog.location.parent.name
+              : 'Select parent'}}
+        </md-select-label>
+        <md-option
+          ng-value="parent"
+          ng-repeat="parent in dialog.parents">
+          {{parent.name}}
+        </md-option>
+      </md-select>
     </div>
   </md-content>
   <div layout="row"
@@ -19,7 +52,7 @@
       Cancel
     </md-button>
     <md-button
-      class="md-raised md-warn"
+      class="md-raised md-primary"
       ng-click="dialog.save()">
       Save
     </md-button>

@@ -42,6 +42,21 @@ function rest($resource) {
     }
   );
 
+  var route = $resource(
+    '/api/routes/:id', { id: '@_id' }, {
+      'create': {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      },
+      'index': { method: 'GET', isArray: true },
+      'show': { method: 'GET', isArray: false },
+      'update': { method: 'PUT' },
+      'destroy': { method: 'DELETE' }
+    }
+  );
+
   var parent = $resource(
     '/api/parents/:id', { id: '@_id' }, {
       'index': { method: 'GET', isArray: true },
@@ -52,6 +67,7 @@ function rest($resource) {
   return {
     level: level,
     location: location,
+    route: route,
     parent: parent
   };
 }
