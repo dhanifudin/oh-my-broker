@@ -4,26 +4,25 @@ angular.module('marker.controllers', [])
   '$rootScope',
   '$scope',
   '$mdDialog',
-  '$mdToast',
   '$timeout',
   '$data',
   '$rest',
+  '$myToast',
   'leafletData',
   appCtrl
 ])
 
 .controller('LocationDialog', [
   '$mdDialog',
-  '$mdToast',
   '$timeout',
   '$data',
   '$rest',
+  '$myToast',
   locationDialog
 ]);
 
-function appCtrl($rootScope, $scope, $mdDialog, $mdToast, $timeout, $data, $rest, leafletData) {
+function appCtrl($rootScope, $scope, $mdDialog, $timeout, $data, $rest, $myToast, leafletData) {
 
-  var that = this;
   leafletData.getMap().then(mapHandler);
 
   angular.extend($scope, {
@@ -34,7 +33,6 @@ function appCtrl($rootScope, $scope, $mdDialog, $mdToast, $timeout, $data, $rest
     },
     controls: {
       draw: {
-        polyline: false,
         rectangle: false,
         circle: false,
         marker: false
@@ -42,101 +40,90 @@ function appCtrl($rootScope, $scope, $mdDialog, $mdToast, $timeout, $data, $rest
     }
   });
 
-  this.showToast = function(message) {
-    $mdToast.show(
-      $mdToast.simple()
-        .content(message)
-        .hideDelay(2000)
-    );
-  };
-
   function mapHandler(map) {
     L.Icon.Default.imagePath = 'img';
     var drawnItems = $scope.controls.edit.featureGroup;
 
     map.on('draw:created', function(e) {
-      var layer = e.layer;
-      $data.location.geo = polygonToText(layer.toGeoJSON());
-
-      $mdDialog.show({
-        controller: 'LocationDialog as dialog',
-        templateUrl: 'dialogs/location.html',
-      }).then(ok, cancel);
-
-      function ok() {
-        that.showToast($data.location.name + ' has been created');
-        layer.bindLabel($data.location.name).addTo(map);
-        drawnItems.addLayer(layer);
-        $data.location = {};
+      switch(e.layerType) {
+        case 'polyline':
+          polylineHandler(e.layer);
+          break;
+        case 'polygon':
+          polygonHandler(e.layer);
+          break;
       }
 
-      function cancel() {
-        that.showToast('You canceled the dialog');
-        $data.location = {};
-      }
-    });
+      function polylineHandler(layer) {
+        $data.route.geo = geomToText('MULTIPOINT', layer.toGeoJSON());
 
-    var routing = L.Routing.control({
-      routeWhileDragging: true,
-      waypoints: [
-        L.latLng(-7.283188972010171, 112.79238224029541),
-        L.latLng(-7.278846903849963, 112.79789686203003)
-      ]
-    }).addTo(map);
+        var confirm = $mdDialog.confirm()
+          .title('Would you like to save this route?')
+          .ok('Save')
+          .cancel('Cancel');
 
-    routing.on('routesfound', function(e) {
-      var confirm = $mdDialog.confirm()
-        .title('Would you like to save this route?')
-        .ok('Save')
-        .cancel('Cancel');
-        $mdDialog.show(confirm).then(function() {
-          if (e.routes.length) {
-            console.log(getCoordinates(e.routes[0].coordinates));
+        $mdDialog.show(confirm)
+          .then(function() {
             $rest.route.create(
-              getCoordinates(e.routes[0].coordinates),
+              $data.route,
               function(response) {
-                that.showToast('Success: ' + response);
+                $myToast.show('Success: ' + response);
               },
               function(response) {
-                that.showToast('Fail: ' + response);
+                $myToast.show('Fail: ' + response);
               }
-            );
-          } else {
-            that.showToast('Empty routes');
-          }
-        }, function() {
-          that.showToast('Cancel');
+            )
+          }, function() {
+            $myToast.show('Cancel');
+            $data.route = {};
+          });
+      }
+
+      function polygonHandler(layer) {
+        $data.location.geo = geomToText('POLYGON', layer.toGeoJSON());
+
+        $mdDialog.show({
+          controller: 'LocationDialog as dialog',
+          templateUrl: 'dialogs/location.html'
+        }).then(ok, cancel);
+
+        function ok() {
+          $myToast.show($data.location.name + ' has been created');
+          layer.bindLabel($data.location.name).addTo(map);
+          drawnItems.addLayer(layer);
+          $data.location = {};
+        }
+
+        function cancel() {
+          $myToast.show('You canceled the dialog');
+          $data.location = {};
+        }
+
+      }
+
+    });
+
+  }
+
+  function geomToText(type, geojson) {
+    var coordinates = [];
+    switch(type) {
+      case 'POLYGON':
+        geojson.geometry.coordinates[0].forEach(function(geo) {
+          coordinates.push(geo.join(' '));
         });
-    });
-
-    routing.on('routingerror', function(e) {
-      console.log(e);
-    });
-
-  }
-
-  function polygonToText(geojson) {
-    var coordinates = [];
-    geojson.geometry.coordinates[0].forEach(function(geo) {
-      coordinates.push(geo.join(' '));
-    });
-    return 'POLYGON((' + coordinates.join(', ') + '))';
-  }
-
-  function getCoordinates(array) {
-    var coordinates = [];
-    array.forEach(function(location) {
-      coordinates.push({
-        lat: location[0],
-        lon: location[1]
-      });
-    });
-    return JSON.stringify({ geos: coordinates });
+        return type + '((' + coordinates.join(', ') + '))';
+      case 'MULTIPOINT':
+        geojson.geometry.coordinates.forEach(function(geo) {
+          coordinates.push(geo.join(' '));
+        });
+        return type + '(' + coordinates.join(', ') + ')';
+    }
   }
 
 }
 
-function locationDialog($mdDialog, $mdToast, $timeout, $data, $rest) {
+function locationDialog($mdDialog, $timeout, $data, $rest, $myToast) {
 
   var that = this;
 
@@ -151,23 +138,15 @@ function locationDialog($mdDialog, $mdToast, $timeout, $data, $rest) {
     }, 650);
   };
 
-  this.showToast = function(message) {
-    $mdToast.show(
-      $mdToast.simple()
-      .content(message)
-      .hideDelay(2000)
-    );
-  };
-
   this.save = function() {
     $rest.location.create(
       $data.location,
       function(response) {
         $mdDialog.hide();
-        that.showToast('Success: ' + response);
+        $myToast.show('Success: ' + response);
       },
       function(response) {
-        that.showToast('Fail: ' + response);
+        $myToast.show('Fail: ' + response);
       }
     )
   };

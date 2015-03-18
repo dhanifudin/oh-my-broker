@@ -12,14 +12,21 @@ angular.module('marker.services', [
 .factory('$rest', [
   '$resource',
   rest
+])
+
+.factory('$myToast', [
+  '$mdToast',
+  toast
 ]);
 
 function data() {
 
   var location = {};
+  var route = {};
 
   return {
-    location: location
+    location: location,
+    route: route
   };
 }
 
@@ -69,5 +76,20 @@ function rest($resource) {
     location: location,
     route: route,
     parent: parent
+  };
+}
+
+function toast($mdToast) {
+
+  function show(message) {
+    $mdToast.show(
+      $mdToast.simple()
+      .content(message)
+      .hideDelay(2000)
+    );
+  }
+
+  return {
+    show: show
   };
 }

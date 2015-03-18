@@ -7,30 +7,17 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res) {
-  var params = {
-    geos: req.body.geos
-  };
+  var data = [
+    req.body.geo
+  ];
+  console.log(data);
 
   persistence.execute(
-    'INSERT INTO route VALUES(null, unix_timestamp())',
-    null,
+    'INSERT INTO route SET `timestamp` = unix_timestamp(),\
+    geo = GeomFromText(?)',
+    data,
     function(err, rows) {
-      console.log(rows.insertId);
-      params.geos.forEach(function(geo) {
-        var data = {
-          route_id: rows.insertId,
-          lat: geo.lat,
-          lon: geo.lon
-        };
-        persistence.execute(
-          'INSERT INTO geo SET ?',
-          data,
-          function(err1, rows1) {
-            console.log(rows1);
-          }
-        );
-      });
-      res.json('oye');
+      res.json(rows);
     }
   );
 });

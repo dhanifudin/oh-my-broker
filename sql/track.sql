@@ -72,25 +72,27 @@ DROP TABLE IF EXISTS `route`;
 CREATE TABLE `route`(
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `timestamp` INT(11),
-  PRIMARY KEY(`id`)
+  `geo` GEOMETRY NOT NULL,
+  PRIMARY KEY(`id`),
+  SPATIAL KEY `geo` (`geo`)
 ) ENGINE = MyISAM;
 
 -- Geo Table
-DROP TABLE IF EXISTS `geo`;
+-- DROP TABLE IF EXISTS `geo`;
 
-CREATE TABLE `geo`(
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `route_id` INT(11),
-  `lat` DOUBLE,
-  `lon` DOUBLE,
-  PRIMARY KEY (`id`),
-  INDEX `fk_geo_route_idx` (`route_id` ASC),
-  CONSTRAINT `fk_geo_route`
-    FOREIGN KEY (`route_id`)
-    REFERENCES `route` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-) ENGINE = MyISAM;
+-- CREATE TABLE `geo`(
+--   `id` INT(11) NOT NULL AUTO_INCREMENT,
+--   `route_id` INT(11),
+--   `lat` DOUBLE,
+--   `lon` DOUBLE,
+--   PRIMARY KEY (`id`),
+--   INDEX `fk_geo_route_idx` (`route_id` ASC),
+--   CONSTRAINT `fk_geo_route`
+--     FOREIGN KEY (`route_id`)
+--     REFERENCES `route` (`id`)
+--     ON DELETE NO ACTION
+--     ON UPDATE NO ACTION
+-- ) ENGINE = MyISAM;
 
 -- Insert Data
 INSERT INTO `user` (`id`, `username`, `name`) VALUES(1, 'icub', 'Dian Hanifudin Subhi');

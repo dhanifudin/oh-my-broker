@@ -42,7 +42,11 @@ router.post('/', function(req, res) {
     geo = PolyFromText(?), center = Centroid(geo)',
     data,
     function(err, rows) {
-      res.json(rows);
+      if (err) {
+        res.json(err);
+      } else {
+        res.json(rows);
+      }
     }
   );
 });
